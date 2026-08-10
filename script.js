@@ -23,7 +23,6 @@ const gameBoard = (function () {
     },
     resetBoard: function () {
       board = ["?", "?", "?", "?", "?", "?", "?", "?", "?"];
-      console.log("board resetted.");
     },
     getBoard: function () {
       return board;
@@ -57,8 +56,7 @@ const gameController = (function () {
   const checkWin = function () {
     let isFull = false;
     const currentBoard = gameBoard.getBoard();
-    console.log(`currentBoard: ${currentBoard}`);
-    gameBoard.displayBoard();
+    // console.log(`currentBoard: ${currentBoard}`);
 
     for (let i = 0; i < patterns.length; i++) {
       const currentPattern = patterns[i];
@@ -70,9 +68,8 @@ const gameController = (function () {
       // console.log(`values${i}: ${value1}, ${value2}, ${value3}`);
 
       if (value1 === value2 && value2 === value3 && value1 !== "?") {
-        console.log(`${activePlayer.name}(${activePlayer.marker}) won`);
         isGameOver = true;
-        return;
+        return "win";
       }
     }
 
@@ -80,27 +77,35 @@ const gameController = (function () {
       if (!currentBoard.includes("?")) {
         isFull = true;
         isGameOver = true;
-        console.log("It's a draw!");
         gameController.restartGame();
 
-        return;
+        return "draw";
       }
     }
 
-    if (!isGameOver) {
-      activePlayer = activePlayer === players[0] ? players[1] : players[0];
-      console.log(`${activePlayer.name} turn`);
-    }
+    return "continue";
   };
 
   return {
     playRound: function (index) {
       if (!isGameOver) {
         if (gameBoard.putMarker(index, activePlayer.marker)) {
-          console.log(
-            `Marker ${activePlayer.marker} is added at index ${index}`,
-          );
-          checkWin();
+          console.clear();
+          gameBoard.displayBoard();
+
+          const result = checkWin();
+          if (result === "win") {
+            console.log(`${activePlayer.name}(${activePlayer.marker}) won`);
+          } else if (result === "draw") {
+            console.log("It's a draw!");
+          } else {
+            console.log(
+              `Marker ${activePlayer.marker} is added at spot ${index + 1}`,
+            );
+            activePlayer =
+              activePlayer === players[0] ? players[1] : players[0];
+            console.log(`${activePlayer.name} turn`);
+          }
         } else
           console.log("The spot is already taken or out of bounds. Try Again");
       } else {
@@ -120,11 +125,12 @@ const gameController = (function () {
 })();
 
 gameController.playRound(2);
+
 gameController.playRound(4);
-gameController.playRound(6);
-gameController.playRound(1);
-gameController.playRound(7);
-gameController.playRound(8);
-gameController.playRound(0);
-gameController.playRound(3);
-gameController.playRound(5);
+// gameController.playRound(6);
+// gameController.playRound(1);
+// gameController.playRound(7);
+// gameController.playRound(8);
+// gameController.playRound(0);
+// gameController.playRound(3);
+// gameController.playRound(5);
