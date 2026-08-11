@@ -1,3 +1,6 @@
+let container = document.querySelector(".grid-container");
+let gameStatus = document.querySelector(".game-status");
+
 const gameBoard = (function () {
   let board = ["?", "?", "?", "?", "?", "?", "?", "?", "?"];
 
@@ -11,8 +14,21 @@ const gameBoard = (function () {
         }
       }
       console.log(output);
-    },
+      renderBoard();
 
+      /*
+      board.forEach((item, index) => {
+        let box = document.createElement("div");
+        box.className = `box box-${index}`;
+        box.textContent = `${item}`;
+        container.append(box);
+
+        container.innerHTML += `
+         <div data-index=${index} class="box box${index}">${item}</div>`;
+      });
+
+      */
+    },
     putMarker: function (index, marker) {
       if (board[index] === "?" && (marker === "X" || marker === "O")) {
         board[index] = marker;
@@ -88,49 +104,102 @@ const gameController = (function () {
 
   return {
     playRound: function (index) {
+      let message;
       if (!isGameOver) {
         if (gameBoard.putMarker(index, activePlayer.marker)) {
           console.clear();
-          gameBoard.displayBoard();
+          message = `Marker ${activePlayer.marker} is added at spot ${index + 1}`;
 
+          console.log(message);
+          gameStatus.textContent = message;
+          gameBoard.displayBoard();
           const result = checkWin();
           if (result === "win") {
+            message = `${activePlayer.name}(${activePlayer.marker}) won`;
             console.log(`${activePlayer.name}(${activePlayer.marker}) won`);
+            setTimeout(() => {
+              this.restartGame();
+            }, 2000);
+
+            gameStatus.textContent = message;
           } else if (result === "draw") {
+            message = `Draw`;
             console.log("It's a draw!");
-          } else {
-            console.log(
-              `Marker ${activePlayer.marker} is added at spot ${index + 1}`,
-            );
+
+            setTimeout(() => {
+              this.restartGame();
+            }, 2000);
+            gameStatus.textContent = message;
+          } else if (result === "continue") {
             activePlayer =
               activePlayer === players[0] ? players[1] : players[0];
-            console.log(`${activePlayer.name} turn`);
+            console.log(`${activePlayer.name}(${activePlayer.marker}) turn`);
+            message = `${activePlayer.name}(${activePlayer.marker}) turn`;
+            gameStatus.textContent = message;
           }
         } else
           console.log("The spot is already taken or out of bounds. Try Again");
       } else {
+        setTimeout(() => {
+          this.restartGame();
+        }, 2000);
         console.log("Game is Over!");
       }
     },
     getActivePlayer: function () {
-      return `activePlayer: ${activePlayer.name}(${activePlayer.marker})`;
+      return activePlayer;
     },
     restartGame: function () {
       gameBoard.resetBoard();
+
       isGameOver = false;
       activePlayer = players[0];
-      console.log("Game resetted");
+      renderBoard();
+      gameStatus.textContent = "";
     },
   };
 })();
 
-gameController.playRound(2);
-
-gameController.playRound(4);
-// gameController.playRound(6);
+// gameController.playRound(2);
+// gameController.playRound(4);
+// gameController.playRound(0);
 // gameController.playRound(1);
 // gameController.playRound(7);
-// gameController.playRound(8);
-// gameController.playRound(0);
 // gameController.playRound(3);
 // gameController.playRound(5);
+// gameController.playRound(8);
+// gameController.playRound(6);
+// gameController.playRound(0);
+// gameController.playRound(1);
+renderBoard();
+function renderBoard() {
+  container.innerHTML = "";
+
+  let arr = gameBoard.getBoard();
+  for (let i = 0; i < arr.length; i++) {
+    const element = arr[i];
+    container.innerHTML += ` 
+   <div data-index=${i} class="box box${i}">${element}</div>`;
+  }
+}
+
+// container.addEventListener("click", (event) => {
+//   let box = event.target;
+
+//   let indexOfBox = parseInt(box.dataset.index);
+//   if (box.classList.contains("box")) {
+//     console.log(`clicked box: ${indexOfBox}`);
+//   }
+// });
+// console.log(container.innerHTML);
+
+container.addEventListener("click", (event) => {
+  let clickedBox = event.target;
+  if (clickedBox.classList.contains("box") && clickedBox.textContent === "?") {
+    let indexOfBox = parseInt(clickedBox.dataset.index);
+    let activePlayer = gameController.getActivePlayer();
+    clickedBox.textContent = activePlayer.marker;
+
+    gameController.playRound(indexOfBox);
+  }
+});
