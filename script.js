@@ -118,9 +118,13 @@ const gameController = (function () {
           if (result === "win") {
             message = `${activePlayer.name}(${activePlayer.marker}) won`;
             console.log(`${activePlayer.name}(${activePlayer.marker}) won`);
+            const winSound = new Audio();
+            winSound.src = "./audio/winSound.mp3";
+            winSound.play();
+
             setTimeout(() => {
               this.restartGame();
-            }, 2000);
+            }, 3000);
 
             gameStatus.textContent = message;
           } else if (result === "draw") {
@@ -197,6 +201,9 @@ function renderBoard() {
 container.addEventListener("click", (event) => {
   let clickedBox = event.target;
   if (clickedBox.classList.contains("box") && clickedBox.textContent === "?") {
+    const clickSound = new Audio();
+    clickSound.src = "./audio/click-sound.mp3";
+    clickSound.play();
     let indexOfBox = parseInt(clickedBox.dataset.index);
     let activePlayer = gameController.getActivePlayer();
     clickedBox.textContent = activePlayer.marker;
