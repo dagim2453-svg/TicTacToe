@@ -1,5 +1,6 @@
-let container = document.querySelector(".grid-container");
-let gameStatus = document.querySelector(".game-status");
+const container = document.querySelector(".grid-container");
+const gameStatus = document.querySelector(".game-status");
+const restartBtn = document.querySelector(".restart");
 
 const gameBoard = (function () {
   let board = ["?", "?", "?", "?", "?", "?", "?", "?", "?"];
@@ -202,4 +203,7 @@ container.addEventListener("click", (event) => {
 
     gameController.playRound(indexOfBox);
   }
+});
+restartBtn.addEventListener("click", () => {
+  gameController.restartGame();
 });

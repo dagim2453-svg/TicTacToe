@@ -5,12 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TicTacToe</title>
     <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
       body {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+
         font-family:
           system-ui,
           -apple-system,
@@ -23,6 +28,108 @@
           "Open Sans",
           "Helvetica Neue",
           sans-serif;
+      }
+      .nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 20px;
+        padding: 1rem;
+        padding-inline: 1rem;
+        background-color: rgb(21, 63, 50);
+        display: flex;
+
+        gap: 3rem;
+
+        color: white;
+        font-family:
+          poppins,
+          monospace,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          "Open Sans",
+          "Helvetica Neue",
+          sans-serif;
+        font-weight: 550;
+      }
+
+      .logo {
+        font: bold 24px cursive;
+        margin-right: auto;
+        cursor: default;
+      }
+      .nav > * {
+        display: flex;
+        align-items: center;
+
+        padding-inline: 1.5rem;
+      }
+      .rules,
+      .restart,
+      .close-dialog {
+        font-size: 13px;
+        font-family: poppins;
+        font-weight: 520;
+        background-color: transparent;
+        color: white;
+        margin-right: auto;
+        padding: 0.8rem 1rem;
+        cursor: pointer;
+        border: 1px solid #d4d0d07e;
+        border-radius: 4px;
+      }
+      .rules:hover,
+      .restart:hover {
+        background-color: rgb(48, 104, 86);
+        border-color: transparent;
+      }
+      #rules-dialog {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 1rem 1.2rem;
+        border: 1px solid rgb(88, 88, 88);
+        color: rgb(230, 229, 229);
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, 0.7);
+        box-shadow:
+          5px 5px 5px rgb(4, 48, 26),
+          -2px -2px 5px rgb(4, 48, 26);
+        width: 270px;
+        height: 200px;
+        overflow-y: scroll;
+      }
+      #rules-dialog[open] {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #rules-dialog ul {
+        padding: 1rem;
+        margin-top: 0.3rem;
+      }
+      #rules-dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+      .close-div {
+        display: grid;
+        place-items: center;
+        justify-content: center;
+      }
+      .close-dialog {
+        padding: 0.5rem 1.5rem;
+      }
+      .close-dialog:hover {
+        border-color: transparent;
+
+        background-color: rgb(102, 20, 20);
       }
       .container {
         width: 75vw;
@@ -37,19 +144,20 @@
       .container .heading h2 {
         color: rgb(21, 63, 50);
         border-bottom: 1px solid rgb(48, 104, 86);
+        margin-bottom: 1rem;
       }
       .grid-container {
         display: grid;
         justify-content: center;
         gap: 0.5rem;
-        grid-template-columns: repeat(3, 100px);
-        grid-template-rows: repeat(3, 100px);
+        grid-template-columns: repeat(3, 85px);
+        grid-template-rows: repeat(3, 85px);
       }
       .grid-container .box {
         width: 100%;
         height: 100%;
         color: white;
-        font-size: 30px;
+        font-size: 27px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -68,9 +176,75 @@
         font-weight: bold;
         text-align: center;
       }
+      @media (min-width: 700px) {
+        .grid-container {
+          grid-template-columns: repeat(3, 120px);
+          grid-template-rows: repeat(3, 120px);
+        }
+      }
+      @media (max-width: 400px) {
+        .nav {
+          display: flex;
+          justify-content: center;
+        }
+        .logo {
+          font-size: 18px;
+        }
+        .grid-container {
+          grid-template-columns: repeat(3, 75px);
+          grid-template-rows: repeat(3, 75px);
+        }
+        .grid-container .box {
+          font-size: 20px;
+        }
+      }
+      @media (max-width: 300px) {
+        .grid-container {
+          grid-template-columns: repeat(3, 60px);
+          grid-template-rows: repeat(3, 60px);
+        }
+        .grid-container .box {
+          font-size: 16px;
+        }
+      }
+      @media (max-width: 230px) {
+        .grid-container {
+          grid-template-columns: repeat(3, 50px);
+          grid-template-rows: repeat(3, 50px);
+        }
+      }
     </style>
   </head>
   <body>
+    <dialog id="rules-dialog" popover>
+      <ul>
+        <li>The game is played on a 3×3 grid</li>
+        <li>players take turns, one using "X" and the other "O"</li>
+        <li>Players alternate placing their symbol in any empty square.</li>
+        <li>
+          Align three of your symbols horizontally, vertically, or diagonally.
+        </li>
+        <li>The first player to complete a line of three symbols wins.</li>
+        <li>
+          If all squares are filled without a winning line, the game ends in a
+          tie.
+        </li>
+      </ul>
+      <div class="close-div">
+        <button
+          class="close-dialog"
+          popovertarget="rules-dialog"
+          popovertargetaction="hide"
+        >
+          Close
+        </button>
+      </div>
+    </dialog>
+    <div class="nav">
+      <div class="logo">XO</div>
+      <button class="rules" popovertarget="rules-dialog">Rules</button>
+      <button class="restart">Restart</button>
+    </div>
     <div class="container">
       <div class="heading">
         <h2>TicTacToe</h2>
