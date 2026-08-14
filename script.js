@@ -1,6 +1,7 @@
 const container = document.querySelector(".grid-container");
 const gameStatus = document.querySelector(".game-status");
 const restartBtn = document.querySelector(".restart");
+let RowIndexOfWinPattern;
 
 const gameBoard = (function () {
   let board = ["?", "?", "?", "?", "?", "?", "?", "?", "?"];
@@ -15,20 +16,7 @@ const gameBoard = (function () {
         }
       }
       console.log(output);
-      renderBoard();
-
-      /*
-      board.forEach((item, index) => {
-        let box = document.createElement("div");
-        box.className = `box box-${index}`;
-        box.textContent = `${item}`;
-        container.append(box);
-
-        container.innerHTML += `
-         <div data-index=${index} class="box box${index}">${item}</div>`;
-      });
-
-      */
+      gameController.renderBoard();
     },
     putMarker: function (index, marker) {
       if (board[index] === "?" && (marker === "X" || marker === "O")) {
@@ -59,12 +47,12 @@ const gameController = (function () {
   const patterns = [
     [0, 1, 2],
     [3, 4, 5],
-    [6, 7, 8], // rows
+    [6, 7, 8],
     [0, 3, 6],
     [1, 4, 7],
-    [2, 5, 8], // cols
+    [2, 5, 8],
     [0, 4, 8],
-    [2, 4, 6], // diagonals
+    [2, 4, 6],
   ];
 
   let activePlayer = players[0];
@@ -82,10 +70,10 @@ const gameController = (function () {
       const value2 = currentBoard[currentPattern[1]];
       const value3 = currentBoard[currentPattern[2]];
 
-      // console.log(`values${i}: ${value1}, ${value2}, ${value3}`);
-
       if (value1 === value2 && value2 === value3 && value1 !== "?") {
         isGameOver = true;
+        RowIndexOfWinPattern = i;
+
         return "win";
       }
     }
@@ -110,14 +98,22 @@ const gameController = (function () {
         if (gameBoard.putMarker(index, activePlayer.marker)) {
           console.clear();
           message = `Marker ${activePlayer.marker} is added at spot ${index + 1}`;
-
           console.log(message);
           gameStatus.textContent = message;
-          gameBoard.displayBoard();
+
+          gameController.renderBoard();
+
           const result = checkWin();
           if (result === "win") {
             message = `${activePlayer.name}(${activePlayer.marker}) won`;
-            console.log(`${activePlayer.name}(${activePlayer.marker}) won`);
+            if (RowIndexOfWinPattern !== undefined) {
+              let winArray = patterns[RowIndexOfWinPattern];
+              winArray.forEach((item, index) => {
+                let box = document.querySelector(`.box${winArray[index]}`);
+                box.classList.add("win-boxes");
+              });
+            }
+
             const winSound = new Audio();
             winSound.src = "./audio/winSound.mp3";
             winSound.play();
@@ -129,7 +125,6 @@ const gameController = (function () {
             gameStatus.textContent = message;
           } else if (result === "draw") {
             message = `Draw`;
-            console.log("It's a draw!");
 
             setTimeout(() => {
               this.restartGame();
@@ -145,58 +140,45 @@ const gameController = (function () {
         } else
           console.log("The spot is already taken or out of bounds. Try Again");
       } else {
-        setTimeout(() => {
+        scetTimeout(() => {
           this.restartGame();
         }, 2000);
         console.log("Game is Over!");
       }
     },
+    getPattern: function () {
+      return patterns;
+    },
     getActivePlayer: function () {
       return activePlayer;
+    },
+    renderBoard: function () {
+      container.innerHTML = "";
+
+      let arr = gameBoard.getBoard();
+
+      for (let i = 0; i < arr.length; i++) {
+        const element = arr[i];
+        container.innerHTML += ` 
+
+          <div data-index=${i} class="box box${i}">${element}</div>`;
+      }
     },
     restartGame: function () {
       gameBoard.resetBoard();
 
       isGameOver = false;
       activePlayer = players[0];
-      renderBoard();
+      this.renderBoard();
       gameStatus.textContent = "";
     },
   };
 })();
-
-// gameController.playRound(2);
-// gameController.playRound(4);
-// gameController.playRound(0);
-// gameController.playRound(1);
-// gameController.playRound(7);
-// gameController.playRound(3);
-// gameController.playRound(5);
-// gameController.playRound(8);
-// gameController.playRound(6);
-// gameController.playRound(0);
-// gameController.playRound(1);
-renderBoard();
-function renderBoard() {
-  container.innerHTML = "";
-
-  let arr = gameBoard.getBoard();
-  for (let i = 0; i < arr.length; i++) {
-    const element = arr[i];
-    container.innerHTML += ` 
-   <div data-index=${i} class="box box${i}">${element}</div>`;
-  }
-}
-
-// container.addEventListener("click", (event) => {
-//   let box = event.target;
-
-//   let indexOfBox = parseInt(box.dataset.index);
-//   if (box.classList.contains("box")) {
-//     console.log(`clicked box: ${indexOfBox}`);
-//   }
-// });
-// console.log(container.innerHTML);
+gameController.playRound(0);
+gameController.playRound(3);
+gameController.playRound(0);
+gameController.playRound(2);
+gameController.playRound(5);
 
 container.addEventListener("click", (event) => {
   let clickedBox = event.target;
@@ -211,6 +193,7 @@ container.addEventListener("click", (event) => {
     gameController.playRound(indexOfBox);
   }
 });
+
 restartBtn.addEventListener("click", () => {
   gameController.restartGame();
 });
