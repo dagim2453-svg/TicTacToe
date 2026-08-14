@@ -61,7 +61,6 @@ const gameController = (function () {
   const checkWin = function () {
     let isFull = false;
     const currentBoard = gameBoard.getBoard();
-    // console.log(`currentBoard: ${currentBoard}`);
 
     for (let i = 0; i < patterns.length; i++) {
       const currentPattern = patterns[i];
@@ -94,11 +93,11 @@ const gameController = (function () {
   return {
     playRound: function (index) {
       let message;
+      gameStatus.style.borderColor = " darkslategrey";
+
       if (!isGameOver) {
         if (gameBoard.putMarker(index, activePlayer.marker)) {
-          console.clear();
           message = `Marker ${activePlayer.marker} is added at spot ${index + 1}`;
-          console.log(message);
           gameStatus.textContent = message;
 
           gameController.renderBoard();
@@ -133,14 +132,14 @@ const gameController = (function () {
           } else if (result === "continue") {
             activePlayer =
               activePlayer === players[0] ? players[1] : players[0];
-            console.log(`${activePlayer.name}(${activePlayer.marker}) turn`);
+
             message = `${activePlayer.name}(${activePlayer.marker}) turn`;
             gameStatus.textContent = message;
           }
         } else
           console.log("The spot is already taken or out of bounds. Try Again");
       } else {
-        scetTimeout(() => {
+        setTimeout(() => {
           this.restartGame();
         }, 2000);
         console.log("Game is Over!");
@@ -170,15 +169,10 @@ const gameController = (function () {
       isGameOver = false;
       activePlayer = players[0];
       this.renderBoard();
-      gameStatus.textContent = "";
+      gameStatus.textContent = `${activePlayer.name}(${activePlayer.marker}) turn`;
     },
   };
 })();
-gameController.playRound(0);
-gameController.playRound(3);
-gameController.playRound(0);
-gameController.playRound(2);
-gameController.playRound(5);
 
 container.addEventListener("click", (event) => {
   let clickedBox = event.target;
@@ -197,3 +191,4 @@ container.addEventListener("click", (event) => {
 restartBtn.addEventListener("click", () => {
   gameController.restartGame();
 });
+gameController.renderBoard();
