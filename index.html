@@ -181,6 +181,13 @@
       }
       .win-boxes {
         background-color: rgb(9, 156, 41) !important;
+        animation: glow 1s infinite alternate;
+      }
+
+      @keyframes glow {
+        to {
+          box-shadow: 0 0 12px rgb(9, 156, 41);
+        }
       }
       .container .box:hover {
         cursor: pointer;
