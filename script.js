@@ -2,6 +2,8 @@ const container = document.querySelector(".grid-container");
 const gameStatus = document.querySelector(".game-status");
 const restartBtn = document.querySelector(".restart");
 let RowIndexOfWinPattern;
+const clickSound = new Audio("./audio/click-sound.mp3");
+clickSound.load();
 
 const gameBoard = (function () {
   let board = ["?", "?", "?", "?", "?", "?", "?", "?", "?"];
@@ -112,7 +114,7 @@ const gameController = (function () {
                 box.classList.add("win-boxes");
               });
             }
-
+            clickSound.pause();
             const winSound = new Audio();
             winSound.src = "./audio/winSound.mp3";
             winSound.play();
@@ -177,8 +179,6 @@ const gameController = (function () {
 container.addEventListener("click", (event) => {
   let clickedBox = event.target;
   if (clickedBox.classList.contains("box") && clickedBox.textContent === "?") {
-    const clickSound = new Audio();
-    clickSound.src = "./audio/click-sound.mp3";
     clickSound.play();
     let indexOfBox = parseInt(clickedBox.dataset.index);
     let activePlayer = gameController.getActivePlayer();
